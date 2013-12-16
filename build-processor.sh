@@ -2,6 +2,8 @@
 # Any copyright is dedicated to the Public Domain.
 # http://creativecommons.org/publicdomain/zero/1.0/
 
+export EMCC_CFLAGS="-O2"
+
 cd zbar-0.10
 # unpacked from http://downloads.sourceforge.net/project/zbar/zbar/0.10/zbar-0.10.tar.bz2
 
@@ -11,7 +13,7 @@ emconfigure ./configure  --without-PACKAGE --without-x --without-jpeg --without-
 emmake make
 
 # building simple zbar-main.c application
-emcc -O1 -g0 -I`pwd`/include ../templates/zbar-main.c ./zbar/.libs/libzbar.a --js-library ../templates/zbar-callbacks.js -o ./zbar-processor-content.js
+emcc -I`pwd`/include ../templates/zbar-main.c ./zbar/.libs/libzbar.a --js-library ../templates/zbar-callbacks.js -o ./zbar-processor-content.js -s EXPORTED_FUNCTIONS='["_ZBarProcessImageData"]'
 sed '/\/\* EMSCRIPTEN_CODE \*\//r ./zbar-processor-content.js' ../templates/zbar-processor-wrapper.js > ../zbar-processor.js
 
 cd ..

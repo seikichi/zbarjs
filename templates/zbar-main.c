@@ -27,7 +27,7 @@ extern int js_get_height();
 extern int js_read_image(unsigned char *data, size_t len);
 extern void js_output_result(const char *symbolName, const char *addonName, const char *data);
 
-int main (int argc, const char *argv[])
+int ZBarProcessImageData()
 {
   processor = zbar_processor_create(0);
   assert(processor);

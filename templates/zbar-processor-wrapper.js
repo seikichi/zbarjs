@@ -17,23 +17,39 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-function zbarProcessImageData(imgData) {
-  var result = [];
-  var Module = {};
-  Module['imageWidth'] = imgData.width;
-  Module['imageHeight'] = imgData.height;
-  Module['getImageData'] = function (grayData) {
-    var d = imgData.data;
-    for (var i = 0, j = 0; i < d.length; i += 4, j++) {
-      grayData[j] = (d[i] * 66 + d[i + 1] * 129 + d[i + 2] * 25 + 4096) >> 8;
+var zbarProcessImageData = (function() {
+  var Module = null;
+
+  var zbarProcessImageData = function (imgData) {
+    if (Module === null) {
+      zbarProcessImageData.initializeModule({});
     }
+
+    var result = [];
+    Module['imageWidth'] = imgData.width;
+    Module['imageHeight'] = imgData.height;
+    Module['getImageData'] = function (grayData) {
+      var d = imgData.data;
+      for (var i = 0, j = 0; i < d.length; i += 4, j++) {
+        grayData[j] = (d[i] * 66 + d[i + 1] * 129 + d[i + 2] * 25 + 4096) >> 8;
+      }
+    };
+    Module['outputResult'] = function (symbol, addon, data) {
+      result.push([symbol, addon, data]);
+    };
+    Module['ccall']('ZBarProcessImageData', 'number', [], []);
+    return result;
   };
-  Module['outputResult'] = function (symbol, addon, data) {
-    result.push([symbol, addon, data]);
+
+  zbarProcessImageData.initializeModule = function (options) {
+    Module = (function () {
+      var Module = options || {};
+
+      /* EMSCRIPTEN_CODE */
+
+      return Module;
+    })();
   };
 
-  /* EMSCRIPTEN_CODE */
-
-  return result;
-}
-
+  return zbarProcessImageData
+})();
